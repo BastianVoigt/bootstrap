@@ -81,23 +81,6 @@ angular.module('ui.bootstrap.modal', [])
     };
   }])
 
-  .directive('modalWindow', ['$timeout', function ($timeout) {
-    return {
-      restrict: 'EA',
-      replace: true,
-      link: function (scope, element, attrs) {
-        var $$modal = {};
-        $$modal.index = attrs.index || '';
-        $$modal.windowClass = attrs.windowClass || '';
-
-        //trigger CSS transitions
-        $timeout(function () {
-          $$modal.animate = true;
-        });
-      }
-    };
-  }])
-
   .factory('$modalStack', ['$document', '$compile', '$rootScope', '$$stackedMap',
     function ($document, $compile, $rootScope, $$stackedMap) {
 
@@ -164,9 +147,8 @@ angular.module('ui.bootstrap.modal', [])
           keyboard: modal.keyboard
         });
 
-        var angularDomEl = angular.element("<div modal-window class=\"modal fade {{ $$modal.windowClass }}\" ng-class=\"{in: $$modal.animate}\" ng-style=\"{'z-index': 1050 + $$modal.index*10}\"></div>");
-        angularDomEl.attr('window-class', modal.windowClass);
-        angularDomEl.attr('index', openedWindows.length() - 1);
+        var angularDomEl = angular.element("<div class=\"modal fade {{ windowClass }}\" ng-class=\"{in: animate}\" ng-style=\"{'z-index': 1050 + index*10}\"></div>");
+        modal.scope.index = openedWindows.length() - 1;
         angularDomEl.html(modal.content);
 
         var modalDomEl = $compile(angularDomEl)(modal.scope);
@@ -281,14 +263,17 @@ angular.module('ui.bootstrap.modal', [])
 
                 ctrlInstance = $controller(modalOptions.controller, ctrlLocals);
               }
+              
+              if(modalOptions.windowClass) {
+                modalScope.windowClass = modalOptions.windowClass;
+              }
 
               $modalStack.open(modalInstance, {
                 scope: modalScope,
                 deferred: modalResultDeferred,
                 content: tplAndVars[0],
                 backdrop: modalOptions.backdrop,
-                keyboard: modalOptions.keyboard,
-                windowClass: modalOptions.windowClass
+                keyboard: modalOptions.keyboard
               });
 
             }, function resolveError(reason) {
