@@ -84,18 +84,15 @@ angular.module('ui.bootstrap.modal', [])
   .directive('modalWindow', ['$timeout', function ($timeout) {
     return {
       restrict: 'EA',
-      scope: {
-        index: '@'
-      },
       replace: true,
-      transclude: true,
-      templateUrl: 'template/modal/window.html',
       link: function (scope, element, attrs) {
-        scope.windowClass = attrs.windowClass || '';
+        var $$modal = {};
+        $$modal.index = attrs.index || '';
+        $$modal.windowClass = attrs.windowClass || '';
 
         //trigger CSS transitions
         $timeout(function () {
-          scope.animate = true;
+          $$modal.animate = true;
         });
       }
     };
@@ -167,7 +164,7 @@ angular.module('ui.bootstrap.modal', [])
           keyboard: modal.keyboard
         });
 
-        var angularDomEl = angular.element('<div modal-window></div>');
+        var angularDomEl = angular.element("<div modal-window class=\"modal fade {{ $$modal.windowClass }}\" ng-class=\"{in: $$modal.animate}\" ng-style=\"{'z-index': 1050 + $$modal.index*10}\"></div>");
         angularDomEl.attr('window-class', modal.windowClass);
         angularDomEl.attr('index', openedWindows.length() - 1);
         angularDomEl.html(modal.content);
